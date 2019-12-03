@@ -1,0 +1,829 @@
+import mysql.connector as sql
+from tabulate import tabulate
+
+d0 = 3
+d1 = 3
+d2 = 3
+d3 = 0
+mycon = sql.connect(host="localhost", user="root", passwd="9250", database="library")
+
+id1 = 0
+name = ""
+psswd = 0
+class0 = 0
+brown = 3
+
+java = 0
+java0 = 0
+
+
+def display():
+    print()
+    print()
+    print("\t \t \t welcome to our Library management software")
+    print()
+    print()
+
+    print("Press [1] for Login, [2] to register")
+    global d0
+    d0 = int(input("Enter your Choice: "))
+    first()
+
+
+def first():
+    if d0 == 1:
+        print()
+        print()
+        print("Press [1] for Teacher's Login, [2] for Student's Login ")
+        print()
+        global d1
+        d1 = int(input("Enter your choice: "))
+        login()
+
+    elif d0 == 2:
+        register1()
+    else:
+        print()
+        print("Invalid option!")
+        print()
+        back0 = int(input("Press [1] to go back, [2] to exit"))
+        if back0 == 1:
+            first()
+        elif back0 == 2:
+            exit()
+        print()
+
+
+def login():
+    cur = mycon.cursor()
+
+    global id1
+    global name
+    global psswd
+    global class0
+
+    if d1 == 1:
+        print()
+        name = input("Enter your Name: ")
+        psswd = int(input("Enter your Password: "))
+
+        cur.execute("select teacherid from teachers where name='" + name + "'")
+        data = cur.fetchall()
+        for i in data:
+            id1 = i[0]
+        print(id1)
+
+        s = "select * from teachers"
+        cur.execute(s)
+
+    if d1 == 2:
+        print()
+        name = input("Enter your Name: ")
+        psswd = int(input("Enter your Password: "))
+        class0 = int(input("Enter your Class: "))
+
+        cur.execute("select studentid from students1")
+        data = cur.fetchall()
+        for i in data:
+            id1 = i[0]
+        print(id1)
+
+        s = "select * from students1"
+        cur.execute(s)
+
+    q = cur.fetchall()
+    new = []
+    for i in q:
+        if name in i:
+            new += [i]
+            break
+    else:
+        print()
+        print()
+        print("Entered data doesn't exist")
+
+    jap = (new[0])[1]
+
+    if d0 == 1:
+        if psswd == jap:
+            print()
+            print("Success u r logged in")
+            print()
+            print()
+            print("Welcome " + name)
+            print()
+            info()
+        else:
+            print()
+            print("Error while loggin u in, either ur password or username was wrong")
+            print("incorrect password, don't try to hack please we have pretty low security")
+            print()
+            print("Press [1] to go back, [2] to exit")
+            back0 = int(input("Enter your Choice: "))
+            if back0 == 1:
+                first()
+            elif back0 == 2:
+                exit()
+
+    if d1 == 2:
+        cap = (new[0])[3]
+        if class0 == cap:
+            print()
+            print("success u r logged in")
+        else:
+            print()
+            print("Error while loggin u in, either ur password or username was wrong")
+            print("incorrect password, don't try to hack please we have pretty low security")
+            print("Press [1] to go back, [2] to exit")
+            back0 = int(input("Enter your Choice: "))
+            if back0 == 1:
+                first()
+            elif back0 == 2:
+                exit()
+
+
+def register1():
+    global java0
+    cur = mycon.cursor()
+    if java == 0:
+        java0 = input("Press [1] for new Student Entry, Press[2] for new teacher Entry: ")
+    else:
+        pass
+
+    if java0 == 1:
+        name1 = input("Enter name: ")
+        psswd1 = int(input("Enter password: "))
+        studentid = input("Enter student id: ")
+        class1 = int(input("Enter Class: "))
+        sql5 = "insert into students1 values(%s,%s,%s,%s)"
+        val = (name1, psswd1, studentid, class1)
+
+        cur.execute(sql5, val)
+
+    elif java0 == 2:
+        name1 = input("Enter name: ")
+        psswd1 = int(input("Enter password: "))
+        teacherid = int(input("Enter teacher id: "))
+        sql5 = "insert into teachers values(%s,%s,%s)"
+        val = (name1, psswd1, teacherid)
+
+        cur.execute(sql5, val)
+
+    else:
+        print("Invalid choice!")
+
+    mycon.commit()
+
+    print("Data entered successfully")
+    print("Database updated!")
+
+    print()
+    print("Press [1] to go back, [2] to exit")
+    back0 = int(input("Enter your Choice: "))
+    if back0 == 1:
+        if java0 == 0:
+            first()
+        else:
+            loop1()
+
+    elif back0 == 2:
+        exit()
+    print()
+
+
+def info():
+    global psswd
+    if d1 == 1:
+        print()
+        print()
+        print("1. Books brought(History) ")
+        print("2. Edit database")
+        print("3. View personal info")
+        print("4. Change password")
+        print("5. Back")
+
+        y = int(input("Enter your Choice: "))
+
+        if y == 1:
+            books()
+        elif y == 2:
+            edit()
+        elif y == 3:
+            cur = mycon.cursor()
+            cur.execute("select * from tcollec")
+            data = cur.fetchall()
+            print(tabulate(data, headers=['Teachersid', 'Name', 'Surname', 'DOJ', 'Gender', 'Department', 'PhoneNo.'],
+                           tablefmt='psql'))
+            print()
+            print("Press [1] to go back, [2] to exit")
+            back1 = int(input("Enter your Choice: "))
+
+            if back1 == 1:
+                info()
+                return
+            elif back1 == 2:
+                exit()
+            print()
+        elif y == 4:
+            cur = mycon.cursor()
+            passwd = int(input("Enter your old password: "))
+
+            if passwd == psswd:
+                newpsswd = int(input("Enter new password: "))
+                sql2 = "update teachers set psswd=%s where teacherid=%s"
+                val2 = (newpsswd, id1)
+                cur.execute(sql2, val2)
+                mycon.commit()
+                psswd = newpsswd
+                print()
+                print("Your password has been successfully changed!")
+
+                print()
+                print("Press [1] to go back, [2] to exit")
+                back1 = int(input("Enter your Choice: "))
+
+                if back1 == 1:
+                    info()
+                    return
+                elif back1 == 2:
+                    exit()
+                print()
+
+            else:
+                print()
+                print("Incorrect password")
+                info()
+        if y == 5:
+            print()
+            print("Press [1] to go back, [2] to exit")
+            back3 = int(input("Enter your Choice: "))
+            if back3 == 1:
+                first()
+            elif back3 == 2:
+                exit()
+            print()
+
+    elif d1 == 2:
+        print()
+        print("1. Books brought(History) ")
+        print("2. Fine")
+        print("3. View personal info")
+        print("4. Change password")
+        print("5. Back")
+        print()
+        y = int(input("Enter your Choice: "))
+
+        if y == 1:
+            books()
+        elif y == 2:
+            fine()
+        elif y == 3:
+            cur = mycon.cursor()
+            cur.execute("select * from stcollec")
+            data = cur.fetchall()
+            print(tabulate(data, headers=['Studentid', 'Name', 'Surname', 'DOB', 'Gender', 'Class', 'Section'],
+                           tablefmt='psql'))
+
+            print()
+            print("Press [1] to go back, [2] to exit")
+            back1 = int(input("Enter your Choice: "))
+
+            if back1 == 1:
+                info()
+                return
+            elif back1 == 2:
+                exit()
+            print()
+        elif y == 4:
+            cur = mycon.cursor()
+            passwd = int(input("Enter your old password: "))
+
+            if passwd == psswd:
+                newpsswd = str(input("Enter new password: "))
+                sql1 = "update students1 set psswd=%s where studentid=%s"
+                val1 = (newpsswd, id1,)
+                cur.execute(sql1, val1)
+                mycon.commit()
+                print()
+                print("Your password has been successfully changed!")
+                psswd = newpsswd
+
+                print()
+                print("Press [1] to go back, [2] to exit")
+                back1 = int(input("Enter your Choice: "))
+
+                if back1 == 1:
+                    info()
+                    return
+                elif back1 == 2:
+                    exit()
+                print()
+
+            else:
+                print()
+                print("Incorrect password")
+                info()
+
+        elif y == 5:
+            print()
+            print("Press [1] to go back, [2] to exit")
+            back1 = int(input("Enter your Choice: "))
+            if back1 == 1:
+                print("Are you sure you want to Logout?")
+                back0 = input("Press [1] go back, [2] to Continue")
+                if back0 == 1:
+                    info()
+                else:
+                    display()
+            elif back1 == 2:
+                exit()
+            print()
+
+
+def edit():  # For editing data in MySQL(books,authors,type)
+
+    print()
+    print()
+    print()
+    print("EDIT DATABASE")
+    print("1. Edit Books")
+    print("2. Edit Entries")
+    print("3. Edit teachers/students")
+    print("4. Back")
+    print()
+
+    x = int(input("Enter your choice: "))
+    print()
+    rev = 0
+
+    while rev == 0:
+        global d2
+        if x == 1:
+            print("EDIT Books")
+            print("1. Add Books")
+            print("2. Remove Books")
+            print("3. Update Book info")
+            print("4. View All Book")
+            print("5. Back")
+            print()
+            m = int(input("Enter your choice: "))
+            print()
+
+            if m == 1:
+                addbook()
+            elif m == 2:
+                removebook()
+            elif m == 3:
+                modifybook()
+            elif m == 4:
+                allbooks()
+            else:
+                edit()
+
+        elif x == 2:
+            enteries()
+
+        elif x == 3:
+            d2 = 0
+            perinfo()
+        else:
+            rev = 1
+            print("OK head back to your Tkinter Page")
+
+            return rev
+
+    else:
+        edit()
+
+
+# __________________________________________________________________________________________________________________
+
+def allbooks():  # Prints all the books after extracting them from MySQL(Books)
+    cur = mycon.cursor()
+    cur.execute("select * from books")  # executes MySQL command
+    data = cur.fetchall()  # for storing the extracted data
+    print()
+    print()  # just for creating space between the printed output
+    print(
+        tabulate(data, headers=['Bookid', 'Book Name', 'Page count', 'Status', 'Authorid', 'Typeid'],
+                 tablefmt='psql'))
+    # for printing the data() in a formatted table manner
+    print()
+    print()
+
+
+# __________________________________________________________________________________________________________________
+def books():
+    jk0 = 0
+    jk1 = 0
+    jk2 = 0
+    cur = mycon.cursor()
+    print("jkashdkjas", id1)
+    cur.execute("select bookid from borrowers where Studentid_Teacherid="+str(id1))
+    data0 = cur.fetchall()
+    for i in data0:
+        jk0 = i[0]
+
+    cur.execute("select authorid from books where bookid=" + str(jk0))
+    data01 = cur.fetchall()
+    for i in data01:
+        jk1 = i[0]
+
+    cur.execute("select typeid from books where bookid=" + str(jk0))
+    data01 = cur.fetchall()
+    for i in data01:
+        jk2 = i[0]
+
+    sql01 = "select b.Borrowerid, b.Bookid, a.Name, c.Name, d.Name, b.TakenDate, b.BroughtDate from books a, borrowers b, authors c, type d where b.Studentid_Teacherid=%s, a.bookid=%s, c.authorid=%s, d.typeid=%s"
+    val = (id1, jk0, jk1, jk2)
+    cur.execute(sql01, val)
+    data = cur.fetchall()
+    print(tabulate(data, headers=['Borrowerid', 'Bookid', 'Taken date', 'Brought date'], tablefmt='psql'))
+    print()
+    print("press [1] to go back")
+    print("Press [2] to exit")
+    print()
+
+    loop0 = int(input("Enter your Choice: "))
+    if loop0 == 2:
+        quit()
+    if loop0 == 1:
+        info()
+
+
+def addbook():  # Adds your entered data to MySQL(Books,Authors,Type)
+    cur = mycon.cursor()
+    x = int(input("How Many books do you want to add: "))
+    Status = "A"
+    for i in range(0, x):
+        bookid = int(input("Enter Book id: "))
+        name1 = input("Enter Book name: ")
+        pageCount = int(input("Enter no. of pages of the Book: "))
+
+        authorid = int(input("Enter Author's id: "))
+        aname = input("Enter Author's Name: ")
+        asname = input("Enter Author's SurName: ")
+
+        typeid = int(input("Enter Type id: "))
+        tname = input("Enter Type Name: ")
+
+        sql2 = "insert into books values(%s,%s,%s,%s,%s,%s)"
+        val = (bookid, name1, pageCount, Status, authorid, typeid)
+        cur.execute(sql2, val)
+        mycon.commit()  # For editing into the MySQL Database(Books)
+
+        sql2 = "insert into authors values(%s,%s,%s)"
+        val = (authorid, aname, asname)
+        cur.execute(sql2, val)
+        mycon.commit()
+
+        sql2 = "insert into Type values(%s,%s)"
+        val = (typeid, tname)
+        cur.execute(sql2, val)
+        mycon.commit()
+        print()
+        print("Data sucessfully Entered")
+
+        allbooks()
+
+        print("press [1] to go back")
+        print("Press [2] to exit")
+        print()
+        rev = int(input("Enter your Choice: "))
+
+        if rev == 2:
+            quit()
+        else:
+            return rev
+
+        print("Database updated!")
+
+
+# __________________________________________________________________________________________________________________
+
+def removebook():  # Removes entered data from MySQL(Books,Authors,Type)
+    cur = mycon.cursor()
+    allbooks()
+    print()
+    print()
+    x = int(input("How Many books do you want to delete: "))
+    for i in range(0, x):
+        print()
+        x = int(input("Enter the Bookid of the book which you want to delete: "))
+
+        cur.execute("select Authorid from books where Bookid=" + str(x))
+        data = cur.fetchall()
+
+        sql3 = "delete from authors where authorid= %s"  # Deletes data from authors in MySQL
+        val = data[0]
+        cur.execute(sql3, val)
+
+        cur.execute("select Typeid from books where Bookid=" + str(x))
+        data = cur.fetchall()
+
+        sql3 = "delete from type where Typeid= %s"  # Deletes data from type in MySQL
+        val = data[0]
+        cur.execute(sql3, val)
+
+        cur.execute("delete from books where Bookid=" + str(x))  # Deletes data from books in MySQL
+        mycon.commit()
+        print()
+
+        print("Data successfully Deleted")
+        print()
+
+    print("press [1] to go back")
+    print("Press [2] to exit")
+    print()
+
+    rev = int(input("Enter your Choice: "))
+
+    if rev == 2:
+        quit()
+    else:
+        return rev
+
+    print("Database updated!")
+
+
+# __________________________________________________________________________________________________________________
+
+def modifybook():  # Edits entered data in MySQL(Books,Authors,Type)
+    cur = mycon.cursor()
+    x = int(input("How Many books do you want to Edit: "))
+    for i in range(0, x):
+        allbooks()
+
+        print("additional info:...")
+        print()
+
+        cur.execute("select * from authors")  # For printing all the data from MySQL(authors)
+        data2 = cur.fetchall()
+        print(tabulate(data2, headers=['Authorid', 'Name', 'Surname'], tablefmt='psql'))
+        print()
+
+        cur.execute("select * from type")  # For printing all the data from MySQL(type)
+        data3 = cur.fetchall()
+        print(tabulate(data3, headers=['Typeid', 'Type Name'], tablefmt='psql'))
+
+        print()
+        print("Update Books")
+        print()
+
+        bid1 = input("Enter Bookid of book which you want to update: ")
+        cur.execute("select * from books where bookid=" + bid1)
+        data0 = cur.fetchall()
+        # For printing the details of the data you entered from MySQL(books)
+        print(tabulate(data0, headers=['Bookid', 'Book Name', 'Page count', 'Status', 'Authorid', 'Typeid'],
+                       tablefmt='psql'))
+        loop0 = 0
+        flag1 = 0
+
+        while loop0 == 0:
+            print()
+            print()
+            print("ok so what do you want to edit:- ")
+            print("                                1. Bookid")
+            print("                                2. Book Name")
+            print("                                3. Page count")
+            print("                                4. Status")
+            print("                                5. Authorid")
+            print("                                6. Authors Name")
+            print("                                7. Authors Surname")
+            print("                                8. Typeid")
+            print("                                9. Type Name")
+            print("                               10. back")
+            print()
+
+            q = int(input("Enter your Choice: "))
+
+            if q == 1:
+                value = "Bookid"
+                # As there are no. of options to edit from therefore for making code short
+                my = "bookid"
+                book(bid1, value, flag1, my)
+
+            elif q == 2:
+                value = "Book's Name"
+                my = "name"
+                book(bid1, value, flag1, my)
+
+            elif q == 3:
+                value = "book's PageCount"
+                my = "pagecount"
+                book(bid1, value, flag1, my)
+
+            elif q == 4:
+                value = "book status"
+                my = "status"
+                book(bid1, value, flag1, my)
+
+            elif q == 5:
+                value = "author id"
+                my = "authorid"
+                flag1 = 1
+                book(bid1, value, flag1, my)
+
+            elif q == 6:
+                value = "author's name"
+                my = "name"
+                flag1 = 1
+                book(bid1, value, flag1, my)
+
+            elif q == 7:
+                value = "author's surname"
+                my = "surname"
+                flag1 = 1
+                book(bid1, value, flag1, my)
+
+            elif q == 8:
+                value = "type id"
+                my = "typeid"
+                flag1 = 2
+                book(bid1, value, flag1, my)
+
+            elif q == 9:
+                value = "type name"
+                my = "name"
+                flag1 = 2
+                book(bid1, value, flag1, my)
+
+            elif q == 10:
+                rev = 1
+                edit()
+                return rev
+
+            else:
+                print()
+                print("Invalid option!")
+                print()
+                modifybook()
+
+        else:
+            modifybook()  # As user might enter wrong value by mistake
+
+    print("Database updated!")
+
+
+# __________________________________________________________________________________________________________________
+
+def book(bid1, value, flag1, my):  # takes values which needs to be edited in MsQL(Books,Authors,Type)
+    cur = mycon.cursor()
+    print()
+    k = input("Enter new" + value + ": ")
+    if flag1 == 1:
+        mag = "authors"
+    elif flag1 == 2:
+        mag = "type"
+    else:
+        mag = "books"
+
+    sql4 = "update " + mag + " set " + my + "= %s where bookid= %s"
+    val = (k, bid1)
+    cur.execute(sql4, val)  # updates value in MySQL(Books,Authors,Type)
+    mycon.commit()
+    print()
+    print("data updated successfully")
+    print("press [1] to go back")
+    print("Press [2] to exit")
+    print()
+
+    loop0 = int(input("Enter your Choice: "))
+    if loop0 == 2:
+        quit()
+    else:
+        r = 1
+        return r
+        pass
+    print("Database updated!")
+
+
+def enteries():
+    cur = mycon.cursor()
+    cur.execute("select * from  borrowers")
+    data = cur.fetchall()
+    print(tabulate(data, headers=['Borrowerid', 'Studentid_Teacherid', 'Bookid', 'Taken date', 'Brought date',
+                                  'Date difference', 'fine'], tablefmt='psql'))
+    for i in data:
+        print(i[5])
+        if i[5] >= 31:
+            fine1 = i[5] * 2
+            bid = i[0]
+            print("the fine is: ", fine1)
+            print("the bid is: ", bid)
+            sql1 = "update borrowers set fine= %s where borrowerid= %s"
+            val = (fine1, bid)
+            cur.execute(sql1, val)
+            mycon.commit()
+
+
+def fine():
+    cur = mycon.cursor()
+    cur.execute('select Studentid from students1 where name="' + name + '"')
+    data = cur.fetchall()
+    j = []
+    for i in data:
+        j = str(i[0])
+
+    cur.execute('select sum(fine) from Borrowers where Studentid_Teacherid="' + j + '"')
+    data = cur.fetchall()
+
+    print(tabulate(data, headers=['Fine'], tablefmt='psql'))
+
+    print()
+    print("press [1] to go back")
+    print("Press [2] to exit")
+    print()
+
+    loop0 = int(input("Enter your Choice: "))
+    if loop0 == 2:
+        quit()
+    if loop0 == 1:
+        info()
+
+
+def perinfo():
+    print()
+    x = int(input("How Many Entries will you be editing: "))
+    loop0 = 0
+    for i in range(0, x):
+        while loop0 == 0:
+            loop1()
+
+    print("Database updated!")
+
+
+def loop1():
+    global java
+    global java0
+    java = 1
+    print()
+    print()
+    print("ok so what do you want to edit:- ")
+    print("                                1. Add a new student")
+    print("                                2. Remove a student")
+    print("                                3. View all students")
+    print("                                4. Add a new teacher")
+    print("                                5. Remove a teacher")
+    print("                                6. View all teacher")
+    print("                                7. Back")
+
+    print()
+
+    q = int(input("Enter your Choice: "))
+
+    if q == 1:
+        java0 = 1
+        register1()
+
+    elif q == 2:
+        java0 = 1
+        n = "studentid"
+        deleteuser(n)
+
+    elif q == 3:
+        cur = mycon.cursor()
+        cur.execute("select * from stcollec")
+        data = cur.fetchall()
+        print("--------------------Student's information table--------------------")
+        print()
+        print(tabulate(data, headers=['Studentid', 'Name', 'Surname', 'DOB', 'Gender', 'Class', 'Section'],
+                       tablefmt='psql'))
+        print()
+
+    elif q == 4:
+        java0 = 2
+        register1()
+
+    elif q == 5:
+        java0 = 2
+        n = "teacherid"
+        deleteuser(n)
+
+    elif q == 6:
+        cur = mycon.cursor()
+        cur.execute("select * from tcollec")
+        data = cur.fetchall()
+        print("--------------------teacher's information table--------------------")
+        print()
+        print(tabulate(data, headers=['teacherid', 'Name', 'Surname', 'DOj', 'Gender', 'Department', 'PhoneNo.'],
+                       tablefmt='psql'))
+        print()
+
+
+def deleteuser(n):
+    da = input("Enter " + n + " of the whose data you want to change: ")
+    cur = mycon.cursor
+    if java0 == 1:
+        cur.execute("delete from stcollec where studentid=" + da)
+
+    elif java0 == 2:
+        cur.execute("delete from tcollec where teacherid=" + da)
+
+    mycon.commit()
+    print("Database updated Sucessfully!")
+
+
+display()
+
+""""https://github.com/Kartik9250/python.git"""
