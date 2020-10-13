@@ -8,7 +8,7 @@ sno = [0]
 jades = [0]
 events = [0]
 dates = [0]
-TOKEN = "NjcxNzg4NTI1OTM4NjcxNjQ3.XjCB0Q.Xs6FguVIF26eKpez3vsbh6Z-C0A"
+TOKEN = ""
 
 mycon = sql.connect(host = "localhost", user = "kartik", password = "9250", database = "rem")
 cur = mycon.cursor()
@@ -44,8 +44,9 @@ async def on_message(message):
             
         except:
             await message.channel.send("Error... record couldn't be added")
+            
         sql = "insert into records values(, %s, %s, %s)"
-        val = (int(themessage[1]), themessage[2], dt)
+        val = (int(NULL, themessage[1]), themessage[2], dt)
         cur.execute(sql, val)
         mycon.commit()
     
